@@ -62,8 +62,15 @@ const Index = () => {
   const handleLogin = (email: string, password: string) => {
     const user = users.find(u => u.email === email);
     if (user) {
+      // Специальная проверка для админа Himo
+      if (user.email === 'himo@admin.com' && password !== 'admin123') {
+        alert('Неверный пароль для аккаунта администратора');
+        return;
+      }
       setCurrentUser(user);
       setIsAuthenticated(true);
+    } else {
+      alert('Пользователь не найден');
     }
   };
 
@@ -194,6 +201,11 @@ const AuthScreen = ({ onLogin, onRegister }) => {
   };
 
   const demoLogin = (userEmail) => {
+    if (userEmail === 'himo@admin.com') {
+      // Для админа требуется настоящий пароль
+      alert('Для входа в аккаунт администратора введите пароль вручную');
+      return;
+    }
     onLogin(userEmail, 'demo');
   };
 
@@ -249,14 +261,18 @@ const AuthScreen = ({ onLogin, onRegister }) => {
             </div>
 
             <div className="space-y-2">
-              <Button
-                onClick={() => demoLogin('himo@admin.com')}
-                variant="outline"
-                className="w-full justify-start"
-              >
-                <span className="text-lg mr-3">👑</span>
-                Войти как Himo (Админ)
-              </Button>
+              <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="flex items-center justify-center mb-2">
+                  <span className="text-lg mr-2">👑</span>
+                  <span className="font-semibold text-gray-800">Аккаунт администратора</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  Email: <code className="bg-gray-100 px-1 rounded">himo@admin.com</code>
+                </p>
+                <p className="text-sm text-gray-600">
+                  Пароль: <code className="bg-gray-100 px-1 rounded">admin123</code>
+                </p>
+              </div>
               <Button
                 onClick={() => demoLogin('anna@mail.com')}
                 variant="outline"
