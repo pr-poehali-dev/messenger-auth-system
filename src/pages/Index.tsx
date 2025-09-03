@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
@@ -12,54 +14,106 @@ const Index = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState('chats');
   const [selectedChat, setSelectedChat] = useState(null);
+  
+  // Состояния для сообщений
+  const [allMessages, setAllMessages] = useState({});
+  const [allChats, setAllChats] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  // Демо пользователи
-  const users = [
-    { id: 1, name: 'Himo', email: 'himo@admin.com', role: 'admin', avatar: '👑', status: 'online' },
-    { id: 3, name: 'Максим Иванов', email: 'max@mail.com', role: 'user', avatar: '👨', status: 'offline' },
-    { id: 4, name: 'София Козлова', email: 'sofia@mail.com', role: 'user', avatar: '👱‍♀️', status: 'online' },
-  ];
+  // Генерация уникального ID пользователя
+  const generateUserId = () => {
+    return Math.random().toString(36).substr(2, 8).toUpperCase();
+  };
 
-  // Демо чаты
-  const chats = [
-    { 
-      id: 2, 
-      name: 'Команда проекта', 
-      avatar: '👥', 
-      lastMessage: 'Встреча завтра в 10:00', 
-      time: '11:20', 
-      unread: 0,
-      status: 'online'
-    },
-    { 
-      id: 3, 
-      name: 'Максим Иванов', 
-      avatar: '👨', 
-      lastMessage: 'Отправил файлы', 
-      time: 'Вчера', 
-      unread: 1,
-      status: 'offline'
-    },
-    {
-      id: 4,
-      name: 'София Козлова',
-      avatar: '👱‍♀️',
-      lastMessage: 'До встречи!',
-      time: '15:45',
-      unread: 0,
-      status: 'online'
-    },
-  ];
+  // Инициализация данных
+  useEffect(() => {
+    const initialUsers = [
+      { 
+        id: 1, 
+        name: 'Himo', 
+        email: 'himo@admin.com', 
+        role: 'admin', 
+        avatar: '👑', 
+        status: 'online',
+        userId: 'HIMO2024'
+      },
+      { 
+        id: 3, 
+        name: 'Максим Иванов', 
+        email: 'max@mail.com', 
+        role: 'user', 
+        avatar: '👨', 
+        status: 'offline',
+        userId: 'MAX1X7Y9'
+      },
+      { 
+        id: 4, 
+        name: 'София Козлова', 
+        email: 'sofia@mail.com', 
+        role: 'user', 
+        avatar: '👱‍♀️', 
+        status: 'online',
+        userId: 'SOF8Z3A1'
+      },
+    ];
 
-  // Демо сообщения
-  const messages = [
-    { id: 1, sender: 'Команда проекта', text: 'Встреча завтра в 10:00', time: '11:20', isOwn: false },
-    { id: 2, sender: 'Вы', text: 'Будем готовы!', time: '11:21', isOwn: true },
-    { id: 3, sender: 'Максим Иванов', text: 'Отлично, я подготовлю презентацию', time: '11:22', isOwn: false },
-  ];
+    const initialChats = [
+      { 
+        id: 2, 
+        name: 'Команда проекта', 
+        avatar: '👥', 
+        lastMessage: 'Встреча завтра в 10:00', 
+        time: '11:20', 
+        unread: 0,
+        status: 'online',
+        participantIds: [1, 3, 4],
+        isGroup: true
+      },
+      { 
+        id: 3, 
+        name: 'Максим Иванов', 
+        avatar: '👨', 
+        lastMessage: 'Отправил файлы', 
+        time: 'Вчера', 
+        unread: 1,
+        status: 'offline',
+        participantIds: [3],
+        isGroup: false
+      },
+      {
+        id: 4,
+        name: 'София Козлова',
+        avatar: '👱‍♀️',
+        lastMessage: 'До встречи!',
+        time: '15:45',
+        unread: 0,
+        status: 'online',
+        participantIds: [4],
+        isGroup: false
+      },
+    ];
+
+    const initialMessages = {
+      2: [
+        { id: 1, senderId: 3, senderName: 'Максим Иванов', text: 'Встреча завтра в 10:00', time: '11:20', isOwn: false },
+        { id: 2, senderId: 1, senderName: 'Вы', text: 'Будем готовы!', time: '11:21', isOwn: true },
+        { id: 3, senderId: 4, senderName: 'София Козлова', text: 'Отлично, я подготовлю материалы', time: '11:22', isOwn: false },
+      ],
+      3: [
+        { id: 1, senderId: 3, senderName: 'Максим Иванов', text: 'Отправил файлы', time: 'Вчера', isOwn: false },
+      ],
+      4: [
+        { id: 1, senderId: 4, senderName: 'София Козлова', text: 'До встречи!', time: '15:45', isOwn: false },
+      ]
+    };
+
+    setAllUsers(initialUsers);
+    setAllChats(initialChats);
+    setAllMessages(initialMessages);
+  }, []);
 
   const handleLogin = (email: string, password: string) => {
-    const user = users.find(u => u.email === email);
+    const user = allUsers.find(u => u.email === email);
     if (user) {
       // Специальная проверка для админа Himo
       if (user.email === 'himo@admin.com' && password !== 'admin123') {
@@ -68,35 +122,118 @@ const Index = () => {
       }
       setCurrentUser(user);
       setIsAuthenticated(true);
+      
+      // Обновляем статус пользователя на онлайн
+      setAllUsers(prev => prev.map(u => 
+        u.id === user.id ? {...u, status: 'online'} : u
+      ));
     } else {
       alert('Пользователь не найден');
     }
   };
 
   const handleRegister = (name: string, email: string, password: string) => {
+    const newUserId = generateUserId();
     const newUser = {
-      id: users.length + 1,
+      id: Date.now(),
       name,
       email,
       role: 'user',
       avatar: '👤',
-      status: 'online'
+      status: 'online',
+      userId: newUserId
     };
+    
+    setAllUsers(prev => [...prev, newUser]);
     setCurrentUser(newUser);
     setIsAuthenticated(true);
   };
 
+  // Отправка сообщения
+  const sendMessage = (chatId: number, text: string) => {
+    if (!text.trim() || !currentUser) return;
+
+    const newMessage = {
+      id: Date.now(),
+      senderId: currentUser.id,
+      senderName: 'Вы',
+      text: text.trim(),
+      time: new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }),
+      isOwn: true
+    };
+
+    // Добавляем сообщение
+    setAllMessages(prev => ({
+      ...prev,
+      [chatId]: [...(prev[chatId] || []), newMessage]
+    }));
+
+    // Обновляем последнее сообщение в чате
+    setAllChats(prev => prev.map(chat => 
+      chat.id === chatId 
+        ? { ...chat, lastMessage: text.trim(), time: newMessage.time, unread: 0 }
+        : chat
+    ));
+  };
+
+  // Поиск пользователя по ID
+  const findUserById = (userId: string) => {
+    const user = allUsers.find(u => u.userId === userId.toUpperCase());
+    if (user && user.id !== currentUser.id) {
+      // Создаем новый чат если его нет
+      const existingChat = allChats.find(chat => 
+        !chat.isGroup && chat.participantIds.includes(user.id)
+      );
+      
+      if (!existingChat) {
+        const newChat = {
+          id: Date.now(),
+          name: user.name,
+          avatar: user.avatar,
+          lastMessage: 'Начните общение!',
+          time: 'Сейчас',
+          unread: 0,
+          status: user.status,
+          participantIds: [user.id],
+          isGroup: false
+        };
+        setAllChats(prev => [...prev, newChat]);
+      }
+      return user;
+    }
+    return null;
+  };
+
   // Функции для админа
   const banUser = (userId: number) => {
-    console.log(`Пользователь ${userId} заблокирован`);
+    setAllUsers(prev => prev.map(user => 
+      user.id === userId ? { ...user, status: 'banned' } : user
+    ));
+    alert('Пользователь заблокирован');
   };
 
   const deleteUser = (userId: number) => {
-    console.log(`Аккаунт пользователя ${userId} удален`);
+    setAllUsers(prev => prev.filter(user => user.id !== userId));
+    setAllChats(prev => prev.filter(chat => !chat.participantIds.includes(userId)));
+    alert('Аккаунт пользователя удален');
+  };
+
+  const promoteToAdmin = (userId: number) => {
+    setAllUsers(prev => prev.map(user => 
+      user.id === userId ? { ...user, role: 'admin' } : user
+    ));
+    alert('Пользователь назначен администратором');
+  };
+
+  const demoteFromAdmin = (userId: number) => {
+    setAllUsers(prev => prev.map(user => 
+      user.id === userId ? { ...user, role: 'user' } : user
+    ));
+    alert('Права администратора отозваны');
   };
 
   if (!isAuthenticated) {
-    return <AuthScreen onLogin={handleLogin} onRegister={handleRegister} />;
+    return <AuthScreen onLogin={handleLogin} onRegister={handleRegister} users={allUsers} />;
   }
 
   return (
@@ -113,7 +250,7 @@ const Index = () => {
             </Avatar>
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900">{currentUser.name}</h3>
-              <p className="text-sm text-gray-500">{currentUser.role === 'admin' ? 'Администратор' : 'Пользователь'}</p>
+              <p className="text-sm text-gray-500">ID: {currentUser.userId}</p>
             </div>
             {currentUser.role === 'admin' && (
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
@@ -145,11 +282,19 @@ const Index = () => {
 
           <div className="flex-1 overflow-hidden">
             <TabsContent value="chats" className="h-full m-0">
-              <ChatsList chats={chats} selectedChat={selectedChat} onSelectChat={setSelectedChat} />
+              <ChatsList 
+                chats={allChats} 
+                selectedChat={selectedChat} 
+                onSelectChat={setSelectedChat}
+                onFindUser={findUserById}
+              />
             </TabsContent>
 
             <TabsContent value="contacts" className="h-full m-0">
-              <ContactsList contacts={users.filter(u => u.id !== currentUser.id)} />
+              <ContactsList 
+                contacts={allUsers.filter(u => u.id !== currentUser.id)} 
+                onFindUser={findUserById}
+              />
             </TabsContent>
 
             <TabsContent value="profile" className="h-full m-0">
@@ -158,7 +303,13 @@ const Index = () => {
 
             {currentUser.role === 'admin' && (
               <TabsContent value="admin" className="h-full m-0">
-                <AdminPanel users={users} onBanUser={banUser} onDeleteUser={deleteUser} />
+                <AdminPanel 
+                  users={allUsers.filter(u => u.id !== currentUser.id)} 
+                  onBanUser={banUser} 
+                  onDeleteUser={deleteUser}
+                  onPromoteToAdmin={promoteToAdmin}
+                  onDemoteFromAdmin={demoteFromAdmin}
+                />
               </TabsContent>
             )}
           </div>
@@ -168,13 +319,18 @@ const Index = () => {
       {/* Область чата */}
       <div className="flex-1 flex flex-col">
         {selectedChat ? (
-          <ChatArea chat={selectedChat} messages={messages} />
+          <ChatArea 
+            chat={selectedChat} 
+            messages={allMessages[selectedChat.id] || []} 
+            onSendMessage={(text) => sendMessage(selectedChat.id, text)}
+          />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
             <div className="text-center">
               <Icon name="MessageCircle" size={64} className="mx-auto text-blue-500 mb-4" />
               <h2 className="text-2xl font-semibold text-gray-900 mb-2">Добро пожаловать в мессенджер!</h2>
-              <p className="text-gray-600">Выберите чат для начала общения</p>
+              <p className="text-gray-600 mb-4">Выберите чат для начала общения</p>
+              <p className="text-sm text-gray-500">Ваш ID: <code className="bg-gray-200 px-2 py-1 rounded">{currentUser.userId}</code></p>
             </div>
           </div>
         )}
@@ -184,7 +340,7 @@ const Index = () => {
 };
 
 // Компонент авторизации
-const AuthScreen = ({ onLogin, onRegister }) => {
+const AuthScreen = ({ onLogin, onRegister, users }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -289,15 +445,53 @@ const AuthScreen = ({ onLogin, onRegister }) => {
 };
 
 // Компонент списка чатов
-const ChatsList = ({ chats, selectedChat, onSelectChat }) => {
+const ChatsList = ({ chats, selectedChat, onSelectChat, onFindUser }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userIdQuery, setUserIdQuery] = useState('');
+
+  const handleFindUser = () => {
+    if (userIdQuery.trim()) {
+      const foundUser = onFindUser(userIdQuery.trim());
+      if (foundUser) {
+        alert(`Пользователь найден: ${foundUser.name}`);
+        setUserIdQuery('');
+      } else {
+        alert('Пользователь с таким ID не найден');
+      }
+    }
+  };
+
+  const filteredChats = chats.filter(chat =>
+    chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="p-4 space-y-2 h-full overflow-y-auto">
-      <div className="relative mb-4">
-        <Icon name="Search" size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-        <Input placeholder="Поиск чатов..." className="pl-10" />
+      <div className="space-y-3 mb-4">
+        <div className="relative">
+          <Icon name="Search" size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Input 
+            placeholder="Поиск чатов..." 
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          <Input 
+            placeholder="ID пользователя..." 
+            value={userIdQuery}
+            onChange={(e) => setUserIdQuery(e.target.value)}
+            className="flex-1"
+          />
+          <Button onClick={handleFindUser} size="sm">
+            <Icon name="UserPlus" size={16} />
+          </Button>
+        </div>
       </div>
       
-      {chats.map((chat) => (
+      {filteredChats.map((chat) => (
         <Card
           key={chat.id}
           className={`cursor-pointer transition-all hover:shadow-md ${
@@ -313,13 +507,16 @@ const ChatsList = ({ chats, selectedChat, onSelectChat }) => {
                     {chat.avatar}
                   </AvatarFallback>
                 </Avatar>
-                {chat.status === 'online' && (
+                {chat.status === 'online' && !chat.isGroup && (
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-gray-900 truncate">{chat.name}</h3>
+                  <h3 className="font-semibold text-gray-900 truncate">
+                    {chat.name}
+                    {chat.isGroup && <Icon name="Users" size={14} className="inline ml-1" />}
+                  </h3>
                   <span className="text-xs text-gray-500">{chat.time}</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -338,13 +535,20 @@ const ChatsList = ({ chats, selectedChat, onSelectChat }) => {
 };
 
 // Компонент области чата
-const ChatArea = ({ chat, messages }) => {
+const ChatArea = ({ chat, messages, onSendMessage }) => {
   const [newMessage, setNewMessage] = useState('');
 
   const sendMessage = () => {
     if (newMessage.trim()) {
-      console.log('Отправка сообщения:', newMessage);
+      onSendMessage(newMessage);
       setNewMessage('');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   };
 
@@ -359,14 +563,17 @@ const ChatArea = ({ chat, messages }) => {
                 {chat.avatar}
               </AvatarFallback>
             </Avatar>
-            {chat.status === 'online' && (
+            {chat.status === 'online' && !chat.isGroup && (
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
             )}
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{chat.name}</h3>
+            <h3 className="font-semibold text-gray-900 flex items-center gap-1">
+              {chat.name}
+              {chat.isGroup && <Icon name="Users" size={16} />}
+            </h3>
             <p className="text-sm text-gray-500">
-              {chat.status === 'online' ? 'в сети' : 'был(а) недавно'}
+              {chat.isGroup ? 'Групповой чат' : (chat.status === 'online' ? 'в сети' : 'был(а) недавно')}
             </p>
           </div>
         </div>
@@ -380,17 +587,22 @@ const ChatArea = ({ chat, messages }) => {
               key={message.id}
               className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
             >
-              <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.isOwn
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white text-gray-900 shadow-sm'
-                }`}
-              >
-                <p>{message.text}</p>
-                <p className={`text-xs mt-1 ${message.isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
-                  {message.time}
-                </p>
+              <div className="max-w-xs lg:max-w-md">
+                {!message.isOwn && chat.isGroup && (
+                  <p className="text-xs text-gray-500 mb-1 ml-1">{message.senderName}</p>
+                )}
+                <div
+                  className={`px-4 py-2 rounded-lg ${
+                    message.isOwn
+                      ? 'bg-blue-500 text-white rounded-br-sm'
+                      : 'bg-white text-gray-900 shadow-sm rounded-bl-sm'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">{message.text}</p>
+                  <p className={`text-xs mt-1 ${message.isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
+                    {message.time}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
@@ -404,7 +616,7 @@ const ChatArea = ({ chat, messages }) => {
             placeholder="Введите сообщение..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyPress={handleKeyPress}
             className="flex-1"
           />
           <Button onClick={sendMessage} className="bg-blue-500 hover:bg-blue-600">
@@ -417,28 +629,64 @@ const ChatArea = ({ chat, messages }) => {
 };
 
 // Компонент списка контактов
-const ContactsList = ({ contacts }) => {
+const ContactsList = ({ contacts, onFindUser }) => {
+  const [userIdQuery, setUserIdQuery] = useState('');
+
+  const handleFindUser = () => {
+    if (userIdQuery.trim()) {
+      const foundUser = onFindUser(userIdQuery.trim());
+      if (foundUser) {
+        alert(`Пользователь найден: ${foundUser.name}`);
+        setUserIdQuery('');
+      } else {
+        alert('Пользователь с таким ID не найден');
+      }
+    }
+  };
+
   return (
     <div className="p-4 space-y-2 h-full overflow-y-auto">
-      <h3 className="font-semibold text-gray-900 mb-4">Контакты</h3>
+      <div className="mb-4">
+        <h3 className="font-semibold text-gray-900 mb-3">Контакты</h3>
+        <div className="flex gap-2 mb-4">
+          <Input 
+            placeholder="Найти по ID..." 
+            value={userIdQuery}
+            onChange={(e) => setUserIdQuery(e.target.value)}
+            className="flex-1"
+          />
+          <Button onClick={handleFindUser} size="sm">
+            <Icon name="Search" size={16} />
+          </Button>
+        </div>
+      </div>
+      
       {contacts.map((contact) => (
         <Card key={contact.id} className="cursor-pointer hover:shadow-md transition-all">
           <CardContent className="p-3">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Avatar>
-                  <AvatarFallback className="bg-blue-500 text-white">
-                    {contact.avatar}
-                  </AvatarFallback>
-                </Avatar>
-                {contact.status === 'online' && (
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-                )}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Avatar>
+                    <AvatarFallback className="bg-blue-500 text-white">
+                      {contact.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  {contact.status === 'online' && (
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">{contact.name}</h4>
+                  <p className="text-sm text-gray-600">ID: {contact.userId}</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-gray-900">{contact.name}</h4>
-                <p className="text-sm text-gray-600">{contact.email}</p>
-              </div>
+              {contact.role === 'admin' && (
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                  <Icon name="Crown" size={12} className="mr-1" />
+                  Admin
+                </Badge>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -474,6 +722,10 @@ const ProfileSettings = ({ user }) => {
               <span className="text-sm">Email: {user.email}</span>
             </div>
             <div className="flex items-center gap-2">
+              <Icon name="Hash" size={18} className="text-gray-500" />
+              <span className="text-sm">ID: {user.userId}</span>
+            </div>
+            <div className="flex items-center gap-2">
               <Icon name="Shield" size={18} className="text-gray-500" />
               <span className="text-sm">Роль: {user.role === 'admin' ? 'Администратор' : 'Пользователь'}</span>
             </div>
@@ -490,12 +742,12 @@ const ProfileSettings = ({ user }) => {
 };
 
 // Компонент админ-панели
-const AdminPanel = ({ users, onBanUser, onDeleteUser }) => {
+const AdminPanel = ({ users, onBanUser, onDeleteUser, onPromoteToAdmin, onDemoteFromAdmin }) => {
   return (
     <div className="p-4 h-full overflow-y-auto">
       <h3 className="font-semibold text-gray-900 mb-4">Админ-панель</h3>
       <div className="space-y-3">
-        {users.filter(user => user.role !== 'admin').map((user) => (
+        {users.map((user) => (
           <Card key={user.id}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -506,11 +758,41 @@ const AdminPanel = ({ users, onBanUser, onDeleteUser }) => {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h4 className="font-semibold">{user.name}</h4>
+                    <h4 className="font-semibold flex items-center gap-2">
+                      {user.name}
+                      {user.role === 'admin' && (
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                          <Icon name="Crown" size={12} className="mr-1" />
+                          Admin
+                        </Badge>
+                      )}
+                    </h4>
+                    <p className="text-sm text-gray-600">ID: {user.userId}</p>
                     <p className="text-sm text-gray-600">{user.email}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {user.role === 'admin' ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onDemoteFromAdmin(user.id)}
+                      className="text-orange-600 hover:text-orange-700"
+                    >
+                      <Icon name="UserMinus" size={16} className="mr-1" />
+                      Снять
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onPromoteToAdmin(user.id)}
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      <Icon name="UserPlus" size={16} className="mr-1" />
+                      Админ
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="outline"
