@@ -16,22 +16,12 @@ const Index = () => {
   // Демо пользователи
   const users = [
     { id: 1, name: 'Himo', email: 'himo@admin.com', role: 'admin', avatar: '👑', status: 'online' },
-    { id: 2, name: 'Анна Петрова', email: 'anna@mail.com', role: 'user', avatar: '👩', status: 'online' },
     { id: 3, name: 'Максим Иванов', email: 'max@mail.com', role: 'user', avatar: '👨', status: 'offline' },
     { id: 4, name: 'София Козлова', email: 'sofia@mail.com', role: 'user', avatar: '👱‍♀️', status: 'online' },
   ];
 
   // Демо чаты
   const chats = [
-    { 
-      id: 1, 
-      name: 'Анна Петрова', 
-      avatar: '👩', 
-      lastMessage: 'Привет! Как дела?', 
-      time: '12:34', 
-      unread: 2,
-      status: 'online'
-    },
     { 
       id: 2, 
       name: 'Команда проекта', 
@@ -50,13 +40,22 @@ const Index = () => {
       unread: 1,
       status: 'offline'
     },
+    {
+      id: 4,
+      name: 'София Козлова',
+      avatar: '👱‍♀️',
+      lastMessage: 'До встречи!',
+      time: '15:45',
+      unread: 0,
+      status: 'online'
+    },
   ];
 
   // Демо сообщения
   const messages = [
-    { id: 1, sender: 'Анна Петрова', text: 'Привет! Как дела?', time: '12:34', isOwn: false },
-    { id: 2, sender: 'Вы', text: 'Все отлично! А у тебя как?', time: '12:35', isOwn: true },
-    { id: 3, sender: 'Анна Петрова', text: 'Тоже хорошо, работаю над новым проектом', time: '12:36', isOwn: false },
+    { id: 1, sender: 'Команда проекта', text: 'Встреча завтра в 10:00', time: '11:20', isOwn: false },
+    { id: 2, sender: 'Вы', text: 'Будем готовы!', time: '11:21', isOwn: true },
+    { id: 3, sender: 'Максим Иванов', text: 'Отлично, я подготовлю презентацию', time: '11:22', isOwn: false },
   ];
 
   const handleLogin = (email: string, password: string) => {
@@ -201,11 +200,6 @@ const AuthScreen = ({ onLogin, onRegister }) => {
   };
 
   const demoLogin = (userEmail) => {
-    if (userEmail === 'himo@admin.com') {
-      // Для админа требуется настоящий пароль
-      alert('Для входа в аккаунт администратора введите пароль вручную');
-      return;
-    }
     onLogin(userEmail, 'demo');
   };
 
@@ -261,25 +255,21 @@ const AuthScreen = ({ onLogin, onRegister }) => {
             </div>
 
             <div className="space-y-2">
-              <div className="text-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <div className="flex items-center justify-center mb-2">
-                  <span className="text-lg mr-2">👑</span>
-                  <span className="font-semibold text-gray-800">Аккаунт администратора</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  Email: <code className="bg-gray-100 px-1 rounded">himo@admin.com</code>
-                </p>
-                <p className="text-sm text-gray-600">
-                  Пароль: <code className="bg-gray-100 px-1 rounded">admin123</code>
-                </p>
-              </div>
               <Button
-                onClick={() => demoLogin('anna@mail.com')}
+                onClick={() => demoLogin('max@mail.com')}
                 variant="outline"
                 className="w-full justify-start"
               >
-                <span className="text-lg mr-3">👩</span>
-                Войти как Анна
+                <span className="text-lg mr-3">👨</span>
+                Войти как Максим
+              </Button>
+              <Button
+                onClick={() => demoLogin('sofia@mail.com')}
+                variant="outline"
+                className="w-full justify-start"
+              >
+                <span className="text-lg mr-3">👱‍♀️</span>
+                Войти как София
               </Button>
             </div>
 
